@@ -1,0 +1,25 @@
+{{define "content"}}
+<div class="page-header">
+    <h1>Catálogo de Cursos</h1>
+    <p>Escolha um curso para ver e adicionar suas disciplinas.</p>
+</div>
+
+{{if .Courses}}
+<div class="course-grid">
+    {{range .Courses}}
+    <a href="/catalog/course/{{.ID}}" class="course-card">
+        <div class="course-icon">🎓</div>
+        <div class="course-info">
+            <h2 class="course-name">{{.Name}}</h2>
+            <span class="course-university">{{.University}}</span>
+        </div>
+        <span class="course-arrow">→</span>
+    </a>
+    {{end}}
+</div>
+{{else}}
+<div class="empty-state">
+    <p>Nenhum curso disponível no momento.</p>
+</div>
+{{end}}
+{{end}}

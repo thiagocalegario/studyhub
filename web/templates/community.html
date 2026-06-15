@@ -1,0 +1,73 @@
+{{define "content"}}
+<div class="page-header">
+    <div class="page-header-top">
+        <div>
+            <span class="discipline-code-lg">{{.Discipline.Code}}</span>
+            <h1>Fórum da Turma</h1>
+            <p>{{.Discipline.Name}} &middot; {{.Discipline.Semester}}º Semestre</p>
+        </div>
+        <a href="/disciplines/{{.Discipline.ID}}" class="btn btn-outline-dark">← Voltar</a>
+    </div>
+</div>
+
+{{if .Error}}
+<div class="alert alert-error">{{.Error}}</div>
+{{end}}
+
+<div class="community-layout">
+
+    <!-- Feed de posts -->
+    <div class="community-feed">
+        {{if .Posts}}
+            {{range .Posts}}
+            <div class="community-post {{if .IsOwner}}community-post-own{{end}}">
+                <div class="community-post-header">
+                    <div class="community-avatar">{{slice .UserName 0 1}}</div>
+                    <div class="community-post-meta">
+                        <span class="community-post-author">
+                            {{.UserName}}
+                            {{if .IsOwner}}<span class="badge-own">você</span>{{end}}
+                        </span>
+                        <span class="community-post-date">{{.CreatedAt.Format "02/01/2006 às 15:04"}}</span>
+                    </div>
+                </div>
+                <div class="community-post-content">{{.Content}}</div>
+                {{if .IsOwner}}
+                <div class="community-post-footer">
+                    <form action="/disciplines/community/post/delete" method="POST">
+                        <input type="hidden" name="post_id" value="{{.ID}}" />
+                        <input type="hidden" name="discipline_id" value="{{.DisciplineID}}" />
+                        <button type="submit" class="btn btn-danger btn-xs"
+                            onclick="return confirm('Deseja excluir esta mensagem?')">
+                            Excluir
+                        </button>
+                    </form>
+                </div>
+                {{end}}
+            </div>
+            {{end}}
+        {{else}}
+        <div class="empty-state">
+            <p>Nenhuma mensagem ainda. Seja o primeiro a postar!</p>
+        </div>
+        {{end}}
+    </div>
+
+    <!-- Formulário fixo no rodapé da coluna -->
+    <div class="community-form-wrapper">
+        <form action="/disciplines/community/post/add" method="POST" class="community-form">
+            <input type="hidden" name="discipline_id" value="{{.Discipline.ID}}" />
+            <div class="community-input-row">
+                <textarea
+                    name="content"
+                    rows="2"
+                    placeholder="Escreva sua mensagem, dúvida ou contribuição..."
+                    required
+                ></textarea>
+                <button type="submit" class="btn btn-primary">Publicar</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{{end}}

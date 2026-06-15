@@ -1,0 +1,47 @@
+{{define "content"}}
+<div class="page-header">
+    <div class="page-header-top">
+        <div>
+            <h1>Minhas Disciplinas</h1>
+            <p>Disciplinas que você está acompanhando.</p>
+        </div>
+        <a href="/catalog" class="btn btn-outline-dark">Explorar catálogo</a>
+    </div>
+</div>
+
+{{if .Semesters}}
+    {{range .Semesters}}
+    <section class="semester-section">
+        <h2 class="semester-title">{{.Number}}º Semestre</h2>
+        <div class="discipline-grid">
+            {{range .Disciplines}}
+            <div class="discipline-card discipline-added">
+                <div class="discipline-info">
+                    <span class="discipline-code">{{.Code}}</span>
+                    <h3 class="discipline-name">{{.Name}}</h3>
+                    <div class="discipline-meta">
+                        <span class="discipline-workload">{{.Workload}}h</span>
+                        {{if gt .TopicCount 0}}
+                        <span class="topic-count">{{.TopicCount}} tópico{{if gt .TopicCount 1}}s{{end}}</span>
+                        {{end}}
+                    </div>
+                </div>
+                <div class="discipline-action">
+                    <a href="/disciplines/{{.ID}}" class="btn btn-primary btn-sm">Abrir</a>
+                    <form action="/disciplines/remove" method="POST" style="display:inline;">
+                        <input type="hidden" name="discipline_id" value="{{.ID}}" />
+                        <button type="submit" class="btn btn-danger btn-sm">Remover</button>
+                    </form>
+                </div>
+            </div>
+            {{end}}
+        </div>
+    </section>
+    {{end}}
+{{else}}
+<div class="empty-state">
+    <p>Você ainda não adicionou nenhuma disciplina.</p>
+    <a href="/catalog" class="btn btn-primary">Explorar catálogo</a>
+</div>
+{{end}}
+{{end}}

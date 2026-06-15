@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS disciplines (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(20) NOT NULL,
+    name VARCHAR(200) NOT NULL,
+    semester INTEGER NOT NULL,
+    workload INTEGER NOT NULL
+);

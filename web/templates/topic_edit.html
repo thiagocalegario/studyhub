@@ -1,0 +1,55 @@
+{{define "content"}}
+<div class="page-header">
+    <div class="page-header-top">
+        <div>
+            <span class="discipline-code-lg">{{.Discipline.Code}}</span>
+            <h1>Editar Tópico</h1>
+            <p>{{.Discipline.Name}}</p>
+        </div>
+        <a href="/disciplines/{{.Discipline.ID}}" class="btn btn-outline-dark">← Voltar</a>
+    </div>
+</div>
+
+{{if .Error}}
+<div class="alert alert-error">{{.Error}}</div>
+{{end}}
+
+<div class="topic-form-card">
+    <form action="/disciplines/topic/edit/{{.Topic.ID}}" method="POST" class="topic-form">
+        <input type="hidden" name="topic_id" value="{{.Topic.ID}}" />
+        <input type="hidden" name="discipline_id" value="{{.Discipline.ID}}" />
+
+        <div class="form-group">
+            <label for="title">Título</label>
+            <input type="text" id="title" name="title" value="{{.Topic.Title}}" required />
+        </div>
+
+        <div class="form-group">
+            <label for="content">Conteúdo</label>
+            <textarea id="content" name="content" rows="8" required>{{.Topic.Content}}</textarea>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="tag">Categoria</label>
+                <select id="tag" name="tag">
+                    {{range .Tags}}
+                    <option value="{{.}}" {{if eq . $.Topic.Tag}}selected{{end}}>{{.}}</option>
+                    {{end}}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    {{range .Statuses}}
+                    <option value="{{.}}" {{if eq . $.Topic.Status}}selected{{end}}>{{.}}</option>
+                    {{end}}
+                </select>
+            </div>
+            <div class="form-actions-inline">
+                <button type="submit" class="btn btn-primary">Salvar alterações</button>
+            </div>
+        </div>
+    </form>
+</div>
+{{end}}

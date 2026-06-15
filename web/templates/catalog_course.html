@@ -1,0 +1,51 @@
+{{define "content"}}
+<div class="page-header">
+    <div class="page-header-top">
+        <div>
+            <span class="discipline-code-lg">{{.Course.University}}</span>
+            <h1>{{.Course.Name}}</h1>
+            <p>Selecione as disciplinas que deseja acompanhar.</p>
+        </div>
+        <a href="/catalog" class="btn btn-outline-dark">← Voltar aos cursos</a>
+    </div>
+</div>
+
+{{if .Semesters}}
+    {{range .Semesters}}
+    <section class="semester-section">
+        <h2 class="semester-title">{{.Number}}º Semestre</h2>
+        <div class="discipline-grid">
+            {{range .Disciplines}}
+            <div class="discipline-card {{if .Added}}discipline-added{{end}}">
+                <div class="discipline-info">
+                    <span class="discipline-code">{{.Code}}</span>
+                    <h3 class="discipline-name">{{.Name}}</h3>
+                    <span class="discipline-workload">{{.Workload}}h</span>
+                </div>
+                <div class="discipline-action">
+                    {{if .Added}}
+                    <a href="/disciplines/{{.ID}}" class="btn btn-outline-dark btn-sm">Abrir</a>
+                    <form action="/disciplines/remove" method="POST" style="display:inline;">
+                        <input type="hidden" name="discipline_id" value="{{.ID}}" />
+                        <input type="hidden" name="redirect_to" value="/catalog/course/{{$.Course.ID}}" />
+                        <button type="submit" class="btn btn-danger btn-sm">Remover</button>
+                    </form>
+                    {{else}}
+                    <form action="/disciplines/add" method="POST">
+                        <input type="hidden" name="discipline_id" value="{{.ID}}" />
+                        <input type="hidden" name="course_id" value="{{$.Course.ID}}" />
+                        <button type="submit" class="btn btn-primary btn-sm">Adicionar</button>
+                    </form>
+                    {{end}}
+                </div>
+            </div>
+            {{end}}
+        </div>
+    </section>
+    {{end}}
+{{else}}
+<div class="empty-state">
+    <p>Nenhuma disciplina encontrada para este curso.</p>
+</div>
+{{end}}
+{{end}}

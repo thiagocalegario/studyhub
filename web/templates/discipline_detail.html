@@ -1,0 +1,117 @@
+{{define "content"}}
+<div class="page-header">
+    <div class="page-header-top">
+        <div>
+            <span class="discipline-code-lg">{{.Discipline.Code}}</span>
+            <h1>{{.Discipline.Name}}</h1>
+            <p>{{.Discipline.Semester}}º Semestre &middot; {{.Discipline.Workload}}h</p>
+        </div>
+        <div style="display:flex; gap:0.75rem; align-items:flex-start;">
+            <a href="/disciplines/{{.Discipline.ID}}/community" class="btn btn-community">💬 Fórum da turma</a>
+            <a href="/my-disciplines" class="btn btn-outline-dark">← Voltar</a>
+        </div>
+    </div>
+</div>
+
+{{if .Error}}
+<div class="alert alert-error">{{.Error}}</div>
+{{end}}
+
+<section class="detail-section">
+    <h2 class="section-title">Adicionar Tópico</h2>
+    <div class="topic-form-card">
+        <form action="/disciplines/topic/add" method="POST" class="topic-form">
+            <input type="hidden" name="discipline_id" value="{{.Discipline.ID}}" />
+            <div class="form-group">
+                <label for="title">Título</label>
+                <input type="text" id="title" name="title" placeholder="Ex: Resumo da aula 1, Dúvida sobre recursão..." required />
+            </div>
+            <div class="form-group">
+                <label for="content">Conteúdo</label>
+                <textarea id="content" name="content" rows="4" placeholder="Escreva suas anotações, dúvidas ou resumos aqui..." required></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="tag">Categoria</label>
+                    <select id="tag" name="tag">
+                        {{range .Tags}}
+                        <option value="{{.}}">{{.}}</option>
+                        {{end}}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status">
+                        {{range .Statuses}}
+                        <option value="{{.}}">{{.}}</option>
+                        {{end}}
+                    </select>
+                </div>
+                <div class="form-actions-inline">
+                    <button type="submit" class="btn btn-primary">Salvar Tópico</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section class="detail-section">
+    <div class="section-header">
+        <h2 class="section-title">Meus Tópicos</h2>
+        <div class="filters">
+            <form method="GET" action="/disciplines/{{.Discipline.ID}}" class="filter-form">
+                <select name="tag" onchange="this.form.submit()">
+                    <option value="">Todas as categorias</option>
+                    {{range .Tags}}
+                    <option value="{{.}}" {{if eq . $.FilterTag}}selected{{end}}>{{.}}</option>
+                    {{end}}
+                </select>
+                <select name="status" onchange="this.form.submit()">
+                    <option value="">Todos os status</option>
+                    {{range .Statuses}}
+                    <option value="{{.}}" {{if eq . $.FilterStatus}}selected{{end}}>{{.}}</option>
+                    {{end}}
+                </select>
+                {{if or .FilterTag .FilterStatus}}
+                <a href="/disciplines/{{.Discipline.ID}}" class="btn btn-outline-dark btn-sm">Limpar filtros</a>
+                {{end}}
+            </form>
+        </div>
+    </div>
+
+    {{if .Topics}}
+    <div class="topics-list">
+        {{range .Topics}}
+        <div class="topic-card">
+            <div class="topic-header">
+                <div class="topic-meta">
+                    <h3 class="topic-title">{{.Title}}</h3>
+                    <div class="topic-badges">
+                        <span class="badge badge-tag badge-{{.Tag | tagClass}}">{{.Tag}}</span>
+                        <span class="badge badge-status badge-{{.Status | statusClass}}">{{.Status}}</span>
+                    </div>
+                </div>
+                <span class="topic-date">{{.CreatedAt.Format "02/01/2006 às 15:04"}}</span>
+            </div>
+            <div class="topic-content">{{.Content}}</div>
+            <div class="topic-footer">
+                <a href="/disciplines/topic/edit/{{.ID}}" class="btn btn-outline-dark btn-sm">Editar</a>
+                <form action="/disciplines/topic/delete" method="POST" style="display:inline;">
+                    <input type="hidden" name="topic_id" value="{{.ID}}" />
+                    <input type="hidden" name="discipline_id" value="{{.DisciplineID}}" />
+                    <button type="submit" class="btn btn-danger btn-sm"
+                        onclick="return confirm('Deseja excluir este tópico?')">
+                        Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+        {{end}}
+    </div>
+    {{else}}
+    <div class="empty-state">
+        <p>Nenhum tópico encontrado{{if or .FilterTag .FilterStatus}} com os filtros selecionados{{end}}.</p>
+    </div>
+    {{end}}
+</section>
+{{end}}

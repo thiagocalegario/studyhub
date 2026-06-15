@@ -1,0 +1,36 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{.Title}} — StudyHub</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            {{if .User}}
+                <a href="/my-disciplines" class="logo">📚 StudyHub</a>
+                <nav class="nav">
+                    <a href="/catalog">Catálogo</a>
+                    <a href="/my-disciplines">Minhas Disciplinas</a>
+                    <span class="nav-user">{{.User.Name}}</span>
+                    <a href="/logout" class="btn btn-outline">Sair</a>
+                </nav>
+            {{else}}
+                <a href="/login" class="logo">📚 StudyHub</a>
+            {{end}}
+        </div>
+    </header>
+
+    <main class="main">
+        {{template "content" .}}
+    </main>
+
+    <footer class="footer">
+        <p>StudyHub — Licenciatura em Computação · UnB</p>
+    </footer>
+</body>
+</html>
+{{end}}
