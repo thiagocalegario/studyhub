@@ -52,7 +52,7 @@ func main() {
 	})
 
 	mux.HandleFunc("/logout", handlers.Logout)
-
+	
 	// Catálogo
 	mux.HandleFunc("/catalog", middleware.RequireAuth(handlers.CatalogPage))
 	mux.HandleFunc("/catalog/course/", middleware.RequireAuth(func(w http.ResponseWriter, r *http.Request) {
@@ -78,6 +78,9 @@ func main() {
 	// Fórum comunitário
 	mux.HandleFunc("/disciplines/community/post/add", middleware.RequireAuth(handlers.AddCommunityPost))
 	mux.HandleFunc("/disciplines/community/post/delete", middleware.RequireAuth(handlers.DeleteCommunityPost))
+
+	mux.HandleFunc("/forum/reply/add", middleware.RequireAuth(handlers.AddForumReply))
+	mux.HandleFunc("/ws/forum/", middleware.RequireAuth(handlers.ServeForumWS))
 
 	// Rotas dinâmicas de disciplina — ordem importa: mais específicas primeiro
 	mux.HandleFunc("/disciplines/", middleware.RequireAuth(func(w http.ResponseWriter, r *http.Request) {
