@@ -36,6 +36,12 @@ func RunMigrations() {
 		"db/migrations/002_create_disciplines.sql",
 		"db/migrations/003_create_user_disciplines.sql",
 		"db/migrations/004_seed_disciplines.sql",
+		"db/migrations/005_create_topics.sql",
+		"db/migrations/006_create_courses.sql",
+		"db/migrations/007_seed_courses.sql",
+		"db/migrations/008_alter_topics.sql",
+		"db/migrations/009_create_community_posts.sql",
+		"db/migrations/010_create_forum_replies.sql",
 	}
 
 	for _, file := range migrations {
