@@ -16,58 +16,83 @@
 
 <div class="community-layout">
 
-    <!-- Feed de posts -->
-    <div class="community-feed">
-        {{if .Posts}}
-            {{range .Posts}}
-            <div class="community-post {{if .IsOwner}}community-post-own{{end}}">
-                <div class="community-post-header">
-                    <div class="community-avatar">{{slice .UserName 0 1}}</div>
-                    <div class="community-post-meta">
-                        <span class="community-post-author">
-                            {{.UserName}}
-                            {{if .IsOwner}}<span class="badge-own">você</span>{{end}}
-                        </span>
-                        <span class="community-post-date">{{.CreatedAt.Format "02/01/2006 às 15:04"}}</span>
-                    </div>
-                </div>
-                <div class="community-post-content">{{.Content}}</div>
-                {{if .IsOwner}}
-                <div class="community-post-footer">
-                    <form action="/disciplines/community/post/delete" method="POST">
-                        <input type="hidden" name="post_id" value="{{.ID}}" />
-                        <input type="hidden" name="discipline_id" value="{{.DisciplineID}}" />
-                        <button type="submit" class="btn btn-danger btn-xs"
-                            onclick="return confirm('Deseja excluir esta mensagem?')">
-                            Excluir
-                        </button>
-                    </form>
-                </div>
-                {{end}}
-            </div>
-            {{end}}
-        {{else}}
-        <div class="empty-state">
-            <p>Nenhuma mensagem ainda. Seja o primeiro a postar!</p>
-        </div>
-        {{end}}
-    </div>
-
-    <!-- Formulário fixo no rodapé da coluna -->
+    <!-- Formulário de novo card -->
     <div class="community-form-wrapper">
-        <form action="/disciplines/community/post/add" method="POST" class="community-form">
+        <form id="new-card-form" class="community-form">
             <input type="hidden" name="discipline_id" value="{{.Discipline.ID}}" />
+            <div class="form-group" style="margin-bottom:0.5rem;">
+                <input type="text" id="card-title-input" name="title" placeholder="Título do card..." required />
+            </div>
             <div class="community-input-row">
-                <textarea
-                    name="content"
-                    rows="2"
-                    placeholder="Escreva sua mensagem, dúvida ou contribuição..."
-                    required
-                ></textarea>
+                <textarea id="card-content-input" name="content" rows="2" placeholder="Escreva sua mensagem, dúvida ou contribuição..." required></textarea>
                 <button type="submit" class="btn btn-primary">Publicar</button>
             </div>
         </form>
     </div>
 
+    <!-- Feed de cards -->
+    <div class="community-feed" id="community-feed">
+        {{if .Cards}}
+            {{range .Cards}}
+            <div class="community-card" data-card-id="{{.ID}}">
+                <div class="card-header">
+                    <div class="card-author">
+                        <span class="community-avatar">{{slice .UserName 0 1}}</span>
+                        <div class="card-author-meta">
+                            <span class="community-post-author">
+                                {{.UserName}}
+                                {{if .IsOwner}}<span class="badge-own">você</span>{{end}}
+                            </span>
+                            <span class="community-post-date">{{.CreatedAt.Format "02/01/2006 às 15:04"}}</span>
+                        </div>
+                    </div>
+                    {{if .IsOwner}}
+                    <form class="delete-card-form" data-card-id="{{.ID}}" data-discipline-id="{{$.Discipline.ID}}">
+                        <button type="submit" class="btn btn-danger btn-xs">Excluir</button>
+                    </form>
+                    {{end}}
+                </div>
+                <h3 class="card-title">{{.Title}}</h3>
+                <div class="community-post-content">{{.Content}}</div>
+
+                <!-- Respostas do card -->
+                <div class="card-replies" data-card-id="{{.ID}}">
+                    {{range .Replies}}
+                    <div class="reply" data-reply-id="{{.ID}}">
+                        <div class="reply-header">
+                            <span class="community-avatar reply-avatar">{{slice .UserName 0 1}}</span>
+                            <div class="reply-meta">
+                                <span class="reply-author">{{.UserName}}</span>
+                                <span class="community-post-date">{{.CreatedAt.Format "02/01/2006 às 15:04"}}</span>
+                            </div>
+                        </div>
+                        <div class="reply-content">{{.Content}}</div>
+                    </div>
+                    {{end}}
+                </div>
+
+                <!-- Formulário de resposta -->
+                <form class="reply-form" data-card-id="{{.ID}}">
+                    <input type="hidden" name="card_id" value="{{.ID}}" />
+                    <div class="community-input-row">
+                        <textarea name="content" rows="1" placeholder="Escreva uma resposta..." required></textarea>
+                        <button type="submit" class="btn btn-primary btn-sm">Responder</button>
+                    </div>
+                </form>
+            </div>
+            {{end}}
+        {{else}}
+        <div class="empty-state" id="empty-state">
+            <p>Nenhum card ainda. Seja o primeiro a postar!</p>
+        </div>
+        {{end}}
+    </div>
+
 </div>
+
+<script>
+window.DISCIPLINE_ID = {{.Discipline.ID}};
+window.USER_NAME = {{.User.Name}};
+</script>
+<script src="/static/js/main.js"></script>
 {{end}}
