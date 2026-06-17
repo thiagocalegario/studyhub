@@ -54,3 +54,13 @@ type CommunityPost struct {
 	UserName     string
 	IsOwner      bool
 }
+
+type ForumReply struct {
+	ID       int
+	CardID   int
+	UserID   int
+	Content  string
+	CreatedAt time.Time
+	UserName string
+	IsOwner  bool
+}
