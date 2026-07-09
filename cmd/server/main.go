@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/thiagocalegario/studyhub/internal/database"
@@ -15,6 +16,12 @@ import (
 )
 
 func main() {
+	ex, err := os.Executable()
+	if err == nil {
+		os.Chdir(filepath.Dir(ex))
+	}
+
+	_ = godotenv.Load()
 	_ = godotenv.Load()
 
 	database.Connect()
@@ -52,7 +59,7 @@ func main() {
 	})
 
 	mux.HandleFunc("/logout", handlers.Logout)
-	
+
 	// Catálogo
 	mux.HandleFunc("/catalog", middleware.RequireAuth(handlers.CatalogPage))
 	mux.HandleFunc("/catalog/course/", middleware.RequireAuth(func(w http.ResponseWriter, r *http.Request) {
