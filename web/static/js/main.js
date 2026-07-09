@@ -7,14 +7,19 @@
     var newCardForm = document.getElementById('new-card-form');
     var ws = null;
     var reconnectTimer = null;
+    var isConnecting = false; // adiciona isso
 
     function connect() {
+        if (isConnecting || (ws && ws.readyState === WebSocket.OPEN)) return; // e isso
+        isConnecting = true;
+
         var protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
         var url = protocol + '//' + location.host + '/ws/forum/' + disciplineID;
 
         ws = new WebSocket(url);
 
         ws.onopen = function() {
+            isConnecting = false; // e isso
             if (reconnectTimer) {
                 clearTimeout(reconnectTimer);
                 reconnectTimer = null;
