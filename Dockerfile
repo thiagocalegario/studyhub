@@ -3,7 +3,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN go build -o studyhub ./...
+RUN go build -o studyhub ./cmd/server
 
 FROM alpine:latest
 WORKDIR /app
