@@ -9,5 +9,6 @@ FROM alpine:latest
 WORKDIR /app
 COPY --from=builder /app/studyhub .
 COPY web/ web/
+COPY db/ db/
 EXPOSE 8080
 CMD ["./studyhub"]
