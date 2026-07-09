@@ -251,96 +251,91 @@ func ServeForumWS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := &ws.Client{
-		hub:      hub,
-		conn:     conn,
-		send:     make(chan []byte, 256),
-		UserID:   sess.UserID,
-		UserName: sess.Name,
-		OnMessage: func(c *ws.Client, data []byte) {
-			var msg wsMessage
-			if err := json.Unmarshal(data, &msg); err != nil {
+	client := ws.NewClient(hub, conn, sess.UserID, sess.Name, func(c *ws.Client, data []byte) {
+
+		var msg wsMessage
+		if err := json.Unmarshal(data, &msg); err != nil {
+			return
+		}
+
+		switch msg.Type {
+		case "new_card":
+			title := strings.TrimSpace(msg.Title)
+			content := strings.TrimSpace(msg.Content)
+			if title == "" || content == "" {
 				return
 			}
 
-			switch msg.Type {
-			case "new_card":
-				title := strings.TrimSpace(msg.Title)
-				content := strings.TrimSpace(msg.Content)
-				if title == "" || content == "" {
-					return
-				}
+			var id int
+			err := database.DB.QueryRow(
+				"INSERT INTO community_posts (user_id, discipline_id, title, content) VALUES ($1, $2, $3, $4) RETURNING id",
+				c.UserID, disciplineID, title, content,
+			).Scan(&id)
+			if err != nil {
+				return
+			}
 
-				var id int
-				err := database.DB.QueryRow(
-					"INSERT INTO community_posts (user_id, discipline_id, title, content) VALUES ($1, $2, $3, $4) RETURNING id",
-					c.UserID, disciplineID, title, content,
-				).Scan(&id)
-				if err != nil {
-					return
-				}
-
-				var card models.CommunityPost
-				database.DB.QueryRow(`
+			var card models.CommunityPost
+			database.DB.QueryRow(`
 					SELECT cp.id, cp.user_id, cp.discipline_id, cp.title, cp.content, cp.created_at, u.name
 					FROM community_posts cp
 					INNER JOIN users u ON u.id = cp.user_id
 					WHERE cp.id = $1
 				`, id).Scan(&card.ID, &card.UserID, &card.DisciplineID, &card.Title, &card.Content, &card.CreatedAt, &card.UserName)
-				card.IsOwner = card.UserID == c.UserID
+			card.IsOwner = card.UserID == c.UserID
 
-				hub.BroadcastJSON(map[string]interface{}{
-					"type":    "new_card",
-					"payload": card,
-				})
+			hub.BroadcastJSON(map[string]interface{}{
+				"type":    "new_card",
+				"payload": card,
+			})
 
-			case "new_reply":
-				content := strings.TrimSpace(msg.Content)
-				if content == "" || msg.CardID == 0 {
-					return
-				}
+		case "new_reply":
+			content := strings.TrimSpace(msg.Content)
+			if content == "" || msg.CardID == 0 {
+				return
+			}
 
-				var id int
-				err := database.DB.QueryRow(
-					"INSERT INTO forum_replies (card_id, user_id, content) VALUES ($1, $2, $3) RETURNING id",
-					msg.CardID, c.UserID, content,
-				).Scan(&id)
-				if err != nil {
-					return
-				}
+			var id int
+			err := database.DB.QueryRow(
+				"INSERT INTO forum_replies (card_id, user_id, content) VALUES ($1, $2, $3) RETURNING id",
+				msg.CardID, c.UserID, content,
+			).Scan(&id)
+			if err != nil {
+				return
+			}
 
-				var reply models.ForumReply
-				database.DB.QueryRow(`
+			var reply models.ForumReply
+			database.DB.QueryRow(`
 					SELECT fr.id, fr.card_id, fr.user_id, fr.content, fr.created_at, u.name
 					FROM forum_replies fr
 					INNER JOIN users u ON u.id = fr.user_id
 					WHERE fr.id = $1
 				`, id).Scan(&reply.ID, &reply.CardID, &reply.UserID, &reply.Content, &reply.CreatedAt, &reply.UserName)
-				reply.IsOwner = reply.UserID == c.UserID
+			reply.IsOwner = reply.UserID == c.UserID
 
-				hub.BroadcastJSON(map[string]interface{}{
-					"type":    "new_reply",
-					"payload": reply,
-				})
+			hub.BroadcastJSON(map[string]interface{}{
+				"type":    "new_reply",
+				"payload": reply,
+			})
 
-			case "delete_card":
-				var payload struct {
-					ID int `json:"id"`
-				}
-				if err := json.Unmarshal(data, &payload); err != nil {
-					return
-				}
-				database.DB.Exec(
-					"DELETE FROM community_posts WHERE id = $1 AND user_id = $2",
-					payload.ID, c.UserID,
-				)
-				hub.BroadcastJSON(map[string]interface{}{
-					"type":    "delete_card",
-					"payload": map[string]interface{}{"id": payload.ID},
-				})
+		case "delete_card":
+			var payload struct {
+				ID int `json:"id"`
 			}
-		},
-	}
+			if err := json.Unmarshal(data, &payload); err != nil {
+				return
+			}
+			database.DB.Exec(
+				"DELETE FROM community_posts WHERE id = $1 AND user_id = $2",
+				payload.ID, c.UserID,
+			)
+			hub.BroadcastJSON(map[string]interface{}{
+				"type":    "delete_card",
+				"payload": map[string]interface{}{"id": payload.ID},
+			})
+		}
+	},
+	)
 
 	hub.Register(client)
 	go client.WritePump()

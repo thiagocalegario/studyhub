@@ -129,3 +129,14 @@ func (c *Client) WritePump() {
 		}
 	}
 }
+
+func NewClient(h *Hub, conn *websocket.Conn, userID int, userName string, onMessage func(*Client, []byte)) *Client {
+	return &Client{
+		hub:       h,
+		conn:      conn,
+		send:      make(chan []byte, 256),
+		UserID:    userID,
+		UserName:  userName,
+		OnMessage: onMessage,
+	}
+}

@@ -49,6 +49,7 @@ type CommunityPost struct {
 	ID           int
 	UserID       int
 	DisciplineID int
+	Title        string
 	Content      string
 	CreatedAt    time.Time
 	UserName     string
@@ -56,11 +57,11 @@ type CommunityPost struct {
 }
 
 type ForumReply struct {
-	ID       int
-	CardID   int
-	UserID   int
-	Content  string
+	ID        int
+	CardID    int
+	UserID    int
+	Content   string
 	CreatedAt time.Time
-	UserName string
-	IsOwner  bool
+	UserName  string
+	IsOwner   bool
 }
