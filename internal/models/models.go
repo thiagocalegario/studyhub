@@ -46,22 +46,22 @@ type Topic struct {
 }
 
 type CommunityPost struct {
-	ID           int
-	UserID       int
-	DisciplineID int
-	Title        string
-	Content      string
-	CreatedAt    time.Time
-	UserName     string
-	IsOwner      bool
+	ID           int       `json:"id"`
+	UserID       int       `json:"user_id"`
+	DisciplineID int       `json:"discipline_id"`
+	Title        string    `json:"title"`
+	Content      string    `json:"content"`
+	CreatedAt    time.Time `json:"created_at"`
+	UserName     string    `json:"user_name"`
+	IsOwner      bool      `json:"is_owner"`
 }
 
 type ForumReply struct {
-	ID        int
-	CardID    int
-	UserID    int
-	Content   string
-	CreatedAt time.Time
-	UserName  string
-	IsOwner   bool
+	ID        int       `json:"id"`
+	CardID    int       `json:"card_id"`
+	UserID    int       `json:"user_id"`
+	Content   string    `json:"content"`
+	CreatedAt time.Time `json:"created_at"`
+	UserName  string    `json:"user_name"`
+	IsOwner   bool      `json:"is_owner"`
 }
